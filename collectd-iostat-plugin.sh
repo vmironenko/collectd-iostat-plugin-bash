@@ -23,7 +23,7 @@ iostat -dxk 1| awk -v HOSTNAME=$HOSTNAME -v interval=$INTERVAL '!/~|Linux|Time:|
 }
 
 iostat_cpu() {
-iostat -c 1| awk -v HOSTNAME=$HOSTNAME '!/~|Linux|Time:|avg-cpu|Device|^$/{
+iostat -c 1| awk -v HOSTNAME=$HOSTNAME v interval=$INTERVAL '!/~|Linux|Time:|avg-cpu|Device|^$/{
 #user-1   nice-2 system-3 iowait-4  steal-5   idle-6
             print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/user "  " interval=" interval  " N:"  $1 ;
             print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/nice "  " interval=" interval  " N:"  $2 ;
