@@ -1,6 +1,6 @@
 #!/bin/bash
 pid_own="$$"
-HOSTNAME=`hostname -s`
+HOSTNAME=`hostname`
 iostat_disk() {
 iostat -dxk 1| awk -v HOSTNAME=$HOSTNAME '!/~|Linux|Time:|avg-cpu|Device|^$/{
 # device-1, rrqm_se-2,  wrqm_sec-3, r_s-4, w_s-5, rsec-6, wse-7, avgrq_s-8, avgqu_sz-9, await-10, svctm-11,  util-12
@@ -20,14 +20,14 @@ iostat -dxk 1| awk -v HOSTNAME=$HOSTNAME '!/~|Linux|Time:|avg-cpu|Device|^$/{
 
 iostat_cpu() {
 iostat -c 1| awk -v HOSTNAME=$HOSTNAME '!/~|Linux|Time:|avg-cpu|Device|^$/{
-#avg-cpu:  user-2   nice-3 system-4 iowait-5  steal-6   idle-7
-            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/"  $1  "/user "  "N:"  $2 ;
-            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/"  $1  "/nice "  "N:"  $3 ;
-            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/"  $1  "/system "  "N:"  $4 ;
-            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/"  $1  "/iowait "  "N:"  $5 ;
-            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/"  $1  "/steal "  "N:"  $6 ;
-            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/"  $1  "/idle "  "N:"  $7 ;
-            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/"  $1  "/util "  "N:"  $2 + $4 ;
+#user-1   nice-2 system-3 iowait-4  steal-5   idle-6
+            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/user "  "N:"  $1 ;
+            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/nice "  "N:"  $2 ;
+            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/system "  "N:"  $3 ;
+            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/iowait "  "N:"  $4 ;
+            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/steal "  "N:"  $5 ;
+            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/idle "  "N:"  $6 ;
+            print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/util "  "N:"  $1 + $3 ;
 }'
 }
 
@@ -42,4 +42,3 @@ pid_iostat2="`ps -ef|grep "iostat "|grep $pid_iostat_cpu|awk '{print $2}'`"
 
 trap "echo kill -15  $pid_iostat1 $pid_iostat2 $pid_iostat_disk; kill -9 $pid_own; exit;" 1 2 15
 read e
-
