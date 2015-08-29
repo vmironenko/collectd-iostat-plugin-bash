@@ -6,7 +6,7 @@ HOSTNAME="${COLLECTD_HOSTNAME:-$(hostname)}"
 INTERVAL="${COLLECTD_INTERVAL:-1}"
 
 iostat_disk() {
-iostat -dxk 1| awk -v HOSTNAME=$HOSTNAME -v interval=$INTERVAL '!/~|Linux|Time:|avg-cpu|Device|^$/{
+iostat -dxk $INTERVAL | awk -v HOSTNAME=$HOSTNAME -v interval=$INTERVAL '!/~|Linux|Time:|avg-cpu|Device|^$/{
 # device-1, rrqm_se-2,  wrqm_sec-3, r_s-4, w_s-5, rsec-6, wse-7, avgrq_s-8, avgqu_sz-9, await-10, svctm-11,  util-12
             print "PUTVAL "  HOSTNAME  "/iostatplugin/disk/"  $1  "/rrqm"    " interval=" interval  " N:"  $2 ;
             print "PUTVAL "  HOSTNAME  "/iostatplugin/disk/"  $1  "/wrqm"    " interval=" interval  " N:"  $3 ;
@@ -23,7 +23,7 @@ iostat -dxk 1| awk -v HOSTNAME=$HOSTNAME -v interval=$INTERVAL '!/~|Linux|Time:|
 }
 
 iostat_cpu() {
-iostat -c 1| awk -v HOSTNAME=$HOSTNAME -v interval=$INTERVAL '!/~|Linux|Time:|avg-cpu|Device|^$/{
+iostat -c $INTERVAL | awk -v HOSTNAME=$HOSTNAME -v interval=$INTERVAL '!/~|Linux|Time:|avg-cpu|Device|^$/{
 #user-1   nice-2 system-3 iowait-4  steal-5   idle-6
             print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/user"   " interval=" interval  " N:"  $1 ;
             print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/nice"   " interval=" interval  " N:"  $2 ;
