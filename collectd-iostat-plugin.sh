@@ -32,7 +32,7 @@ iostat -c 1| awk -v HOSTNAME=$HOSTNAME v interval=$INTERVAL '!/~|Linux|Time:|avg
             print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/steal"  " interval=" interval  " N:"  $5 ;
             print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/idle"   " interval=" interval  " N:"  $6 ;
             print "PUTVAL "  HOSTNAME  "/iostatplugin/cpu/util"   " interval=" interval  " N:"  $1 + $3 ;
-}'
+        }'
 }
 
 iostat_disk &
