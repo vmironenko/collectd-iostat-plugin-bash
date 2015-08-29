@@ -2,6 +2,9 @@
 There is collectd iostat plugin which collects metrics of disks and cpu and written in bash
 
 Add this section into collectd.conf 
-<Plugin exec>
+<br>
+<pre>
+&lt;Plugin exec&gt;
     Exec "nobody" "/path/to/collectd-iostat-plugin.sh"
-</Plugin>
+&lt;Plugin&gt;
+</pre>
