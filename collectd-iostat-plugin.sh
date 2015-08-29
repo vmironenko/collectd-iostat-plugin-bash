@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eo pipefail
 pid_own="$$"
 HOSTNAME=`hostname`
 iostat_disk() {
