@@ -7,4 +7,7 @@ Add this section into collectd.conf
 &lt;Plugin exec&gt;
     Exec "nobody" "/path/to/collectd-iostat-plugin.sh"
 &lt;Plugin&gt;
+&lt;Plugin exec&gt;
+    Exec "nobody" "/path/to/collectd-vmstat-plugin.sh"
+&lt;Plugin&gt;
 </pre>
