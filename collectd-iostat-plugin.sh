@@ -33,6 +33,7 @@ if (NF==6){
             print "PUTVAL "  HOSTNAME  "/cpu_iostat/gauge-cpu/idle"   " interval=" interval  " N:"  $6 ;
             print "PUTVAL "  HOSTNAME  "/cpu_iostat/gauge-cpu/util"   " interval=" interval  " N:"  $1 + $3 ;
           }
+            system(""); # to flush output buffer
   }'
 }
 
