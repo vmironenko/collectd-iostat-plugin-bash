@@ -8,35 +8,38 @@ INTERVAL="`echo $INTERVAL|sed s'#\..*##'`"
 HOSTNAME="`echo $HOSTNAME|sed 's#\.#_#g'`"
 
 func_iostat() {
-iostat -cdxk "$INTERVAL" | awk -v HOSTNAME="$HOSTNAME" -v interval="$INTERVAL" '!/~|Linux|Time:|avg-cpu|Device|^$/{
-if (NF==12){
-# device-1, rrqm_se-2,  wrqm_sec-3, r_s-4, w_s-5, rsec-6, wse-7, avgrq_s-8, avgqu_sz-9, await-10, svctm-11,  util-12
-            print "PUTVAL "  HOSTNAME  "/disk_iostat/gauge-"  $1  "/rrqm"    " interval=" interval  " N:"  $2 ;
-            print "PUTVAL "  HOSTNAME  "/disk_iostat/gauge-"  $1  "/wrqm"    " interval=" interval  " N:"  $3 ;
-            print "PUTVAL "  HOSTNAME  "/disk_iostat/gauge-"  $1  "/rs"      " interval=" interval  " N:"  $4 ;
-            print "PUTVAL "  HOSTNAME  "/disk_iostat/gauge-"  $1  "/ws"      " interval=" interval  " N:"  $5 ;
-            print "PUTVAL "  HOSTNAME  "/disk_iostat/gauge-"  $1  "/rsec"    " interval=" interval  " N:"  $6 ;
-            print "PUTVAL "  HOSTNAME  "/disk_iostat/gauge-"  $1  "/wsec"    " interval=" interval  " N:"  $7 ;
-            print "PUTVAL "  HOSTNAME  "/disk_iostat/gauge-"  $1  "/avgrqsz" " interval=" interval  " N:"  $8 ;
-            print "PUTVAL "  HOSTNAME  "/disk_iostat/gauge-"  $1  "/avgqusz" " interval=" interval  " N:"  $9 ;
-            print "PUTVAL "  HOSTNAME  "/disk_iostat/gauge-"  $1  "/await"   " interval=" interval  " N:"  $10 ;
-            print "PUTVAL "  HOSTNAME  "/disk_iostat/gauge-"  $1  "/svctm"   " interval=" interval  " N:"  $11 ;
-            print "PUTVAL "  HOSTNAME  "/disk_iostat/gauge-"  $1  "/util"    " interval=" interval  " N:"  $12 ;
-          }
-if (NF==6){
-#user-1   nice-2 system-3 iowait-4  steal-5   idle-6
-            print "PUTVAL "  HOSTNAME  "/cpu_iostat/gauge-cpu/user"   " interval=" interval  " N:"  $1 ;
-            print "PUTVAL "  HOSTNAME  "/cpu_iostat/gauge-cpu/nice"   " interval=" interval  " N:"  $2 ;
-            print "PUTVAL "  HOSTNAME  "/cpu_iostat/gauge-cpu/system" " interval=" interval  " N:"  $3 ;
-            print "PUTVAL "  HOSTNAME  "/cpu_iostat/gauge-cpu/iowait" " interval=" interval  " N:"  $4 ;
-            print "PUTVAL "  HOSTNAME  "/cpu_iostat/gauge-cpu/steal"  " interval=" interval  " N:"  $5 ;
-            print "PUTVAL "  HOSTNAME  "/cpu_iostat/gauge-cpu/idle"   " interval=" interval  " N:"  $6 ;
-            print "PUTVAL "  HOSTNAME  "/cpu_iostat/gauge-cpu/util"   " interval=" interval  " N:"  $1 + $3 ;
-          }
-            system(""); # to flush output buffer
-  }'
-}
+iostat -cdxk "$INTERVAL" | awk -v HOSTNAME="$HOSTNAME" -v interval="$INTERVAL" '!/~|Linux|Time:|^$/{
 
+if ( $0 !~ /[0-9]+/ ) { 
+  gsub("%","");
+  gsub("/","_");
+  s=$0
+ } else {
+  ss=$0
+  n=1
+  if ( s ~ "cpu" ) {
+    dev = "cpu"
+    path="cpu_iostat"
+    d=1
+  } else {
+    dev=$1
+    path="disk_iostat"
+    d=0
+  }
+  col=NF
+  util=0
+  while (n < col+d){
+    n = n + 1
+    $0 = s
+    metric = $n
+    $0 = ss
+    if (metric == "user" || metric == "system" ) util = util + $(n-d)
+    print "PUTVAL "  HOSTNAME  "/" path "/gauge-" dev "/" metric   " interval=" interval  " N:"  $(n-d)
+  }
+  if (path == "cpu_iostat" ) print "PUTVAL "  HOSTNAME  "/" path "/gauge-cpu/util"   " interval=" interval  " N:"  util
+ }
+}'
+}
 
 func_iostat &
 pid_func="$!"
